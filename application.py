@@ -13,18 +13,28 @@ from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 from itsdangerous import URLSafeTimedSerializer
 import mysql.connector
+import os 
 from io import BytesIO
 app=Flask(__name__)
 app.secret_key=secret_key
 app.config['SESSION_TYPE']='filesystem'
 Session(app)
 excel.init_excel(app)
-mydb=mysql.connector.connect(host='localhost',user='root',password='babitha',db='prm')
-smtp_host = "smtp.gmail.com"
+#mydb=mysql.connector.connect(host='localhost',user='root',password='babitha',db='prm')
+db= os.environ['RDS_DB_NAME']
+user=os.environ['RDS_USERNAME']
+password=os.environ['RDS_PASSWORD']
+host=os.environ['RDS_HOSTNAME']
+port=os.environ['RDS_PORT']
+with mysql.connector.connect(host=host,user=user,password=password,db=db) as conn:
+    cursor=conn.cursor(buffered=True)
+    cursor.execute('create table if not exists users(username varchar(15) primary key,password varchar(15),email varchar(80),email_status enum("confirmed","not confirmed"))')
+    cursor.execute('CREATE TABLE if not exists donations(id INT PRIMARY KEY AUTO_INCREMENT,food_type VARCHAR(100) NOT NULL,quantity INT NOT NULL,expiration_date DATE NOT NULL,handling_instructions VARCHAR(255))')
+'''smtp_host = "smtp.gmail.com"
 smtp_port = 587
 smtp_username = "Tata babitha"
 smtp_password = "tatababitha"
-sender_email = "tatababitha366@gmail.com"
+sender_email = "tatababitha366@gmail.com"'''
 @app.route('/')
 def index():
     return render_template('title.html')
@@ -244,7 +254,7 @@ def inventory():
     nearing_expiration_items = cur.fetchall()
     cur.close()
     return render_template('inventory.html',donations=donations,expiring_items=expiring_items,quality=quality,nearing_expiration_items=nearing_expiration_items)
-@app.route('/')
+'''@app.route('/')
 def send_thank_you_emails():
     # Retrieve the current session user's email
     user_email = session.get('email')
@@ -322,7 +332,7 @@ def notify_near_expiration():
             server.login(smtp_username, smtp_password)
             server.send_message(message)
 
-    return "Email notifications sent for nearing expiration food items."
+    return "Email notifications sent for nearing expiration food items."'''
 @app.route('/logout')
 def logout():
     if session.get('user'):
@@ -330,4 +340,5 @@ def logout():
         return redirect(url_for('index'))
     else:
         return redirect(url_for('login'))
-app.run(debug=True,use_reloader=True)
+if __name__=="__main__":       
+    app.run()
