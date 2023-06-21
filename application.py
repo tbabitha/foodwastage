@@ -30,6 +30,7 @@ with mysql.connector.connect(host=host,user=user,password=password,db=db) as con
     cursor=conn.cursor(buffered=True)
     cursor.execute('create table if not exists users(username varchar(15) primary key,password varchar(15),email varchar(80),email_status enum("confirmed","not confirmed"))')
     cursor.execute('CREATE TABLE if not exists donations(id INT PRIMARY KEY AUTO_INCREMENT,food_type VARCHAR(100) NOT NULL,quantity INT NOT NULL,expiration_date DATE NOT NULL,handling_instructions VARCHAR(255))')
+mydb=mysql.connector.connect(host=host,user=user,password=password,db=db)    
 '''smtp_host = "smtp.gmail.com"
 smtp_port = 587
 smtp_username = "Tata babitha"
