@@ -13,8 +13,8 @@ from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 from itsdangerous import URLSafeTimedSerializer
 import mysql.connector
-import os 
 from io import BytesIO
+import os
 app=Flask(__name__)
 app.secret_key=secret_key
 app.config['SESSION_TYPE']='filesystem'
