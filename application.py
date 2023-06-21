@@ -31,11 +31,6 @@ with mysql.connector.connect(host=host,user=user,password=password,db=db) as con
     cursor.execute('create table if not exists users(username varchar(15) primary key,password varchar(15),email varchar(80),email_status enum("confirmed","not confirmed"))')
     cursor.execute('CREATE TABLE if not exists donations(id INT PRIMARY KEY AUTO_INCREMENT,food_type VARCHAR(100) NOT NULL,quantity INT NOT NULL,expiration_date DATE NOT NULL,handling_instructions VARCHAR(255))')
 mydb=mysql.connector.connect(host=host,user=user,password=password,db=db)    
-'''smtp_host = "smtp.gmail.com"
-smtp_port = 587
-smtp_username = "Tata babitha"
-smtp_password = "tatababitha"
-sender_email = "tatababitha366@gmail.com"'''
 @app.route('/')
 def index():
     return render_template('title.html')
@@ -255,85 +250,7 @@ def inventory():
     nearing_expiration_items = cur.fetchall()
     cur.close()
     return render_template('inventory.html',donations=donations,expiring_items=expiring_items,quality=quality,nearing_expiration_items=nearing_expiration_items)
-'''@app.route('/')
-def send_thank_you_emails():
-    # Retrieve the current session user's email
-    user_email = session.get('email')
 
-    if not user_email:
-        return "User email not found in session"
-
-    # Retrieve the current session user's donations
-    user_donations = session.get('donations')
-
-    if not user_donations:
-        return "User donations not found in session"
-
-    # Compose email message
-    subject = "Thank You for Your Donations"
-    body = "Thank you for your generous donations. We appreciate your support.\n\n"
-
-    for donation in user_donations:
-        food_type = donation['food_type']
-        quantity = donation['quantity']
-        handling_instructions = donation['handling_instructions']
-
-        donation_info = f"Donation: {quantity} x {food_type}\nHandling Instructions: {handling_instructions}\n\n"
-        body += donation_info
-
-    message = MIMEMultipart()
-    message['From'] = sender_email
-    message['To'] = user_email
-    message['Subject'] = subject
-    message.attach(MIMEText(body, 'plain'))
-
-    # Send email
-    with smtplib.SMTP(smtp_host, smtp_port) as server:
-        server.starttls()
-        server.login(smtp_username, smtp_password)
-        server.send_message(message)
-
-    return "Thank you emails sent."
-
-@app.route('/')
-def notify_near_expiration():
-    # Retrieve the current session user's email
-    user_email = session.get('email')
-
-    if not user_email:
-        return "User email not found in session"
-
-    # Retrieve food items nearing expiration from the donations table
-    query = "SELECT * FROM donations WHERE expiration_date <= CURDATE() + INTERVAL 3 DAY"
-    cursor = mydb.cursor()
-    cursor.execute(query)
-    nearing_expiration_items = cursor.fetchall()
-    cursor.close()
-
-    # Send email notifications for nearing expiration food items
-    for item in nearing_expiration_items:
-        food_type = item['food_type']
-        quantity = item['quantity']
-        expiration_date = item['expiration_date']
-        handling_instructions = item['handling_instructions']
-
-        # Compose email message
-        subject = f"Food Item Nearing Expiration: {food_type}"
-        body = f"Food Type: {food_type}\nQuantity: {quantity}\nExpiration Date: {expiration_date}\nHandling Instructions: {handling_instructions}"
-
-        message = MIMEMultipart()
-        message['From'] = sender_email
-        message['To'] = user_email
-        message['Subject'] = subject
-        message.attach(MIMEText(body, 'plain'))
-
-        # Send email
-        with smtplib.SMTP(smtp_host, smtp_port) as server:
-            server.starttls()
-            server.login(smtp_username, smtp_password)
-            server.send_message(message)
-
-    return "Email notifications sent for nearing expiration food items."'''
 @app.route('/logout')
 def logout():
     if session.get('user'):
